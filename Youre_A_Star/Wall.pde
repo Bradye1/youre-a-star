@@ -26,14 +26,6 @@ class Wall {
     }
     else {
       for (int j = Math.min(x1, x2); j < Math.max(x1, x2) && j < actualWidth; j+=radius*2) {
-        /*
-        println("j: " + j);
-        println("this.x1: " + this.x1);
-        println("this.y1: " + this.y1);
-        println("this.x2: " + this.x2);
-        println("this.y2: " + this.y2);
-        println("actualWidth: " + actualWidth);
-        */
         getNode(j, this.y1).setTraversal(false);
       }
     }

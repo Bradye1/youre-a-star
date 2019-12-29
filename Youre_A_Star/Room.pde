@@ -66,17 +66,11 @@ public class Room {
       do {
         wallX = (int)random(bottomLeft.x + (2 * diameter), topRight.x - (2 * diameter)); // Use 2 so it can't be next to another wall
         collision = false;
-        println("----------");
         if ( getNode(wallX, (int)startNode.y).getX() == getNode((int)startNode.x, (int)startNode.y).getX() || 
              getNode(wallX, (int)goalNode.y).getX() == getNode((int)goalNode.x, (int)goalNode.y).getX() ) {
                collision = true;
         } else {
           for (PVector door : doorList) {
-            println("wallX: " + wallX);
-            println("door.x " + door.x);
-            println("wallX node: " + getNode(wallX, (int)door.y).getX());
-            println("door  node: " + getNode((int)door.x, (int)door.y).getX());
-            println();
             if (getNode(wallX, (int)door.y).getX() == getNode((int)door.x, (int)door.y).getX()) {
               collision = true;
             }
@@ -97,17 +91,11 @@ public class Room {
       do {
         wallY = (int)random(topRight.y + (3 * diameter), bottomLeft.y - (3 * diameter)); // Use 2 so it can't be next to another wall
         collision = false;
-        println("----------");
         if ( getNode((int)startNode.x, wallY).getY() == getNode((int)startNode.x, (int)startNode.y).getY() || 
              getNode((int)startNode.x, wallY).getY() == getNode((int)goalNode.x, (int)goalNode.y).getY() ) {
                collision = true;
         } else {
           for (PVector door : doorList) {
-            println("wallY: " + wallY);
-            println("door.y " + door.y);
-            println("wallY node: " + getNode((int)door.x, wallY).getY());
-            println("door  node: " + getNode((int)door.x, (int)door.y).getY());
-            println();
             if (getNode((int)door.x, wallY).getY() == getNode((int)door.x, (int)door.y).getY()) {
               collision = true;
             }

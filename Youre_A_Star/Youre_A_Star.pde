@@ -13,6 +13,8 @@ int actualHeight;
 
 boolean start = false;
 boolean complete = false;
+boolean mazeSetupDone = false;
+boolean printedDone = false;
 
 final int NODE_ADJACENT_DISTANCE = 10;
 final int NODE_DIAGONAL_DISTANCE = 14;
@@ -27,6 +29,7 @@ PriorityQueue<Node> closed;
 Stack<Room> roomsToCheck = new Stack<Room>(); // Room corner coords
 ArrayList<PVector> doorList = new ArrayList<PVector>(); // Wall door coords
 
+// Directions to use if you want to use corners as valid travel spaces
 /*
 public enum Direction {
   ABOVE,
@@ -56,6 +59,7 @@ void setup() {
   size(800, 800);
   frameRate(60);
   
+  println("Press space to start once the walls finish generating!");
   actualWidth = width - (width % radius*2);
   actualHeight = height - (height % radius*2);
   
@@ -92,38 +96,28 @@ void setup() {
   // add start node to open heap
   open.add(startNode);
   
-  
   // Rooms setup
   roomList = new ArrayList<Room>();
   drawBorders();
   
-  
-  /*
-  // neigbors test: change color of startNode neighbors
-  for (Node neighbor : getNeighbors(startNode)) {
-    neighbor.setColor(color(0, 0, 255));
-  }
-  */
-  
 }
 
 void draw() {
+  // Clear the screen every frame to update the state
   background(255);
   
   // Maze algorithm
   if (!roomsToCheck.empty()) { //<>//
     Room currRoom = roomsToCheck.pop();
     currRoom.splitRoom();
+  } else {
+    mazeSetupDone = true;
   }
-  
   
   // draw all of the nodes
   for (Node node : nodeList) {
     node.drawNode();
   }
-  
-  // Generate Walls
-  
   
   if (start) {
     // start of A* algorithm
@@ -155,8 +149,9 @@ void draw() {
         }
       }
     }
-    else {
-      //println("Done!");
+    else if (!printedDone) {
+      println("Done!");
+      printedDone = true;
     }
   }
   
@@ -184,14 +179,7 @@ public void drawBorders() {
   Room startRoom = new Room(0, 0, actualWidth, 0, 0, actualHeight, actualWidth, actualHeight);
   startRoom.drawWalls();
   roomList.add(startRoom);
-  roomsToCheck.push(startRoom);
-  
-  /* before adding Rooms:
-  (new Wall(0, 0, width, 0)).build(); // top wall
-  (new Wall(0, 0, 0, height)).build(); // left wall
-  (new Wall(0, height, width, height)).build(); // bottom wall //<>//
-  (new Wall(width, height, width, 0)).build(); // right wall
-  */
+  roomsToCheck.push(startRoom); //<>//
 }
 
 // gets a node at a specific point
@@ -223,10 +211,11 @@ public Node getNeighbor(Node node, Direction dir) {
     case BELOW: return getNode(node.getX(), node.getY() + radius * 2);
     case LEFTHAND: return getNode(node.getX() - radius * 2, node.getY());
     case RIGHTHAND: return getNode(node.getX() + radius * 2, node.getY());
+    // Cases to add if you want to use corners as valid travel spaces
     //case ABOVELEFTHAND: return getNode(node.getX() - radius * 2, node.getY() - radius * 2);
     //case ABOVERIGHTHAND: return getNode(node.getX() + radius * 2, node.getY() - radius * 2);
     //case BELOWLEFTHAND: return getNode(node.getX() - radius * 2, node.getY() + radius * 2);
-   // case BELOWRIGHTHAND: return getNode(node.getX() + radius * 2, node.getY() + radius * 2);
+    //case BELOWRIGHTHAND: return getNode(node.getX() + radius * 2, node.getY() + radius * 2);
     default: return node; // shouldn't ever happen
   }
 }
@@ -273,13 +262,17 @@ public int getDistance(Node node1, Node node2) {
   }
 }
 
-// TODO handle mouse out of range
+// Check if mouse is on the screen
+public boolean isMouseInRange() {
+  return mouseX >= 0 && mouseX <= actualWidth && mouseY >= 0 && mouseY <= actualHeight;
+}
+
 // TODO add feature to restart with current boarders still there
 void mouseDragged() {
-  if (mouseButton == LEFT) {
+  if (mouseButton == LEFT && isMouseInRange()) {
     getNode(mouseX, mouseY).setTraversal(false);
   }
-  else if (mouseButton == RIGHT) {
+  else if (mouseButton == RIGHT && isMouseInRange()) {
     getNode(mouseX, mouseY).setTraversal(true);
   }
 }
@@ -295,12 +288,16 @@ void mouseClicked() {
 
 void keyPressed() {
   if (key == ' ') {
-    println("space");
-    start = !start;
-  }
-  if (key == 'k') {
-    println("Info:");
-    println("mouseX: " + mouseX);
-    println("mouseY: " + mouseY);
+    if (mazeSetupDone) {
+      if (!start) {
+        println("Starting A* search algorithm!");
+      } else {
+        println("Pausing.");
+      }
+      start = !start;
+    }
+    else {
+      println("Please wait until the maze finishes generating!");
+    }
   }
 }
