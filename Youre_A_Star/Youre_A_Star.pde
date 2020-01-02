@@ -3,10 +3,10 @@ import java.util.Stack; // for maze generation
 
 int radius = 7;
 int diameter = radius * 2;
-int startNodeX = 50;
-int startNodeY = 100;
-int goalNodeX = 500;
-int goalNodeY = 300;
+int startNodeX;
+int startNodeY;
+int goalNodeX;
+int goalNodeY;
 // Need these two variables because the width might not be divisible by the diameter
 int actualWidth;
 int actualHeight;
@@ -26,8 +26,8 @@ ArrayList<Node> nodeList;
 ArrayList<Room> roomList;
 PriorityQueue<Node> open;
 PriorityQueue<Node> closed;
-Stack<Room> roomsToCheck = new Stack<Room>(); // Room corner coords
-ArrayList<PVector> doorList = new ArrayList<PVector>(); // Wall door coords
+Stack<Room> roomsToCheck; // Room corner coords
+ArrayList<PVector> doorList; // Wall door coords
 
 // Directions to use if you want to use corners as valid travel spaces
 /*
@@ -57,11 +57,26 @@ public enum Orientation {
   
 void setup() {
   size(800, 800);
-  frameRate(60);
-  
+  frameRate(120);
+
+  init();
+}
+
+void init() {
+  start = false;
+  complete = false;
+  mazeSetupDone = false;
+  printedDone = false;
+  startNodeX = (int)random(diameter, width/2);
+  startNodeY = (int)random(diameter, height - diameter);
+  goalNodeX = (int)random(width/2, width - diameter);
+  goalNodeY = (int)random(diameter, height - diameter);
   println("Press space to start once the walls finish generating!");
   actualWidth = width - (width % radius*2);
   actualHeight = height - (height % radius*2);
+  
+  roomsToCheck = new Stack<Room>();
+  doorList = new ArrayList<PVector>();
   
   // Create nodes and put them in grid
   nodeList = new ArrayList<Node>();
@@ -99,7 +114,6 @@ void setup() {
   // Rooms setup
   roomList = new ArrayList<Room>();
   drawBorders();
-  
 }
 
 void draw() {
@@ -299,5 +313,7 @@ void keyPressed() {
     else {
       println("Please wait until the maze finishes generating!");
     }
+  } else if (key == 'r' || key == 'R') {
+    init();
   }
 }
